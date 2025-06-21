@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Mini Geometry Dash</title>
+  <title>Mini Geometry Dash - Nena Rubia Detallada</title>
   <style>
     /* El canvas ocupará todo el viewport */
     body, html {
@@ -44,12 +44,13 @@
 
     // Escala de juego: definimos “unidades” relativas al alto
     let groundHeight = ch * 0.2;  // zona de suelo en la parte inferior
-    let playerSize = groundHeight * 0.5; // tamaño del jugador
-    const playerX = () => cw * 0.1; // posición fija en X (función para recálculo si se cambia cw)
+    // Doblamos el tamaño del jugador comparado al original (antes era groundHeight * 0.5)
+    let playerSize = groundHeight * 1.0; 
+    const playerX = () => cw * 0.1; // posición fija en X
 
-    // Parámetros de salto/gravedad
-    let gravity = 0.0150 * ch; // gravedad relativa al alto
-    let jumpVelocity = -3.2 * ch; // velocidad inicial de salto
+    // Parámetros de salto/gravedad (puedes ajustar si el salto es muy alto)
+    let gravity = 0.0150 * ch; 
+    let jumpVelocity = -3.2 * ch;
 
     let playerY = ch - groundHeight - playerSize; // posición vertical inicial
     let vy = 0; // velocidad vertical
@@ -90,7 +91,7 @@
     function restartGame() {
       // Recalcular en caso de resize previo
       groundHeight = ch * 0.2;
-      playerSize = groundHeight * 0.5;
+      playerSize = groundHeight * 1.0;
       playerY = ch - groundHeight - playerSize;
       vy = 0;
       obstacles = [];
@@ -100,7 +101,12 @@
       score = 0;
       gameOver = false;
       lastTime = performance.now();
-      document.getElementById('info').style.display = 'none';
+      const infoDiv = document.getElementById('info');
+      infoDiv.textContent = 'DIGAN NO A LAS DROGAS - EN ESPECIAL VOS NARELLA -.-   - Pulsa ESPACIO o CLIC para saltar. Reinicia tras chocar.';
+      infoDiv.style.top = '5%';
+      infoDiv.style.left = '50%';
+      infoDiv.style.transform = 'translate(-50%, -50%)';
+      infoDiv.style.display = 'block';
       requestAnimationFrame(gameLoop);
     }
 
@@ -139,6 +145,7 @@
         }
       }
       for (const ob of obstacles) {
+        // Colisión con caja de tamaño playerSize x playerSize anclada en (playerX(), playerY)
         if (
           playerX() < ob.x + ob.w &&
           playerX() + playerSize > ob.x &&
@@ -146,7 +153,6 @@
           playerY + playerSize > ob.y
         ) {
           gameOver = true;
-          // Mostrar mensaje de Game Over en el div #info
           const infoDiv = document.getElementById('info');
           infoDiv.textContent = '¡Game Over! Pulsa ESPACIO o CLIC para reiniciar';
           infoDiv.style.top = '50%';
@@ -158,60 +164,151 @@
       }
     }
 
-    // Función para dibujar la niña en lugar del cuadrado
+    // Función para dibujar la niña en lugar del cuadrado, rubia y más detallada
     function drawGirl(ctx, x, y, size) {
-      const headRadius = size * 0.2;
+      // size es el ancho base de la caja del jugador. Dibujaremos figura de aproximadamente el doble de altura de una forma "estándar".
+      // Proporciones:
+      // - Cabeza: radio = size * 0.25
+      // - Cuerpo: ancho = size * 0.3 (ligeramente más ancho), alto = size * 0.5
+      // - Piernas y brazos: proporcionales
+      // El total de altura aproximada = cabeza (0.5*size) + cuerpo (0.5*size) + piernas (~0.4*size) = ~1.4*size. Pero como size ya es doble del original, da figura más alta.
+
+      const headRadius = size * 0.25;
       const headCenterX = x + size / 2;
       const headCenterY = y + headRadius;
 
-      // Cabeza
-      ctx.fillStyle = '#fdd7b0';
+      // --- Cabeza ---
+      ctx.fillStyle = '#fdd7b0'; // tono piel
       ctx.beginPath();
       ctx.arc(headCenterX, headCenterY, headRadius, 0, Math.PI * 2);
       ctx.fill();
       ctx.closePath();
 
-      // Cabello
-      ctx.fillStyle = '#663300';
+      // --- Cabello rubio con detalles ---
+      ctx.fillStyle = '#F9E79F'; // rubio claro
       ctx.beginPath();
-      ctx.arc(headCenterX, headCenterY - headRadius * 0.2, headRadius * 1.1, Math.PI, 0, false);
+      // parte superior del cabello: semicírculo con curvas para mechones
+      ctx.moveTo(headCenterX - headRadius * 1.1, headCenterY - headRadius * 0.2);
+      ctx.quadraticCurveTo(headCenterX - headRadius * 0.6, headCenterY - headRadius * 1.2, headCenterX, headCenterY - headRadius * 1.3);
+      ctx.quadraticCurveTo(headCenterX + headRadius * 0.6, headCenterY - headRadius * 1.2, headCenterX + headRadius * 1.1, headCenterY - headRadius * 0.2);
+      ctx.lineTo(headCenterX + headRadius * 1.1, headCenterY + headRadius * 0.1);
+      ctx.quadraticCurveTo(headCenterX + headRadius * 0.6, headCenterY + headRadius * 0.5, headCenterX + headRadius * 0.2, headCenterY + headRadius * 0.6);
+      ctx.quadraticCurveTo(headCenterX, headCenterY + headRadius * 0.7, headCenterX - headRadius * 0.2, headCenterY + headRadius * 0.6);
+      ctx.quadraticCurveTo(headCenterX - headRadius * 0.6, headCenterY + headRadius * 0.5, headCenterX - headRadius * 1.1, headCenterY + headRadius * 0.1);
+      ctx.closePath();
+      ctx.fill();
+
+      // Opcional: líneas de detalle en cabello
+      ctx.strokeStyle = '#E6C56A';
+      ctx.lineWidth = Math.max(1, size * 0.01);
+      ctx.beginPath();
+      // mechón izquierdo
+      ctx.moveTo(headCenterX - headRadius * 0.8, headCenterY - headRadius * 0.1);
+      ctx.lineTo(headCenterX - headRadius * 0.4, headCenterY + headRadius * 0.3);
+      // mechón derecho
+      ctx.moveTo(headCenterX + headRadius * 0.8, headCenterY - headRadius * 0.1);
+      ctx.lineTo(headCenterX + headRadius * 0.4, headCenterY + headRadius * 0.3);
+      ctx.stroke();
+      ctx.closePath();
+
+      // --- Ojos ---
+      const eyeRadius = size * 0.04;
+      const eyeOffsetX = size * 0.1;
+      const eyeY = headCenterY - size * 0.02;
+      ctx.fillStyle = '#000';
+      // ojo izquierdo
+      ctx.beginPath();
+      ctx.arc(headCenterX - eyeOffsetX, eyeY, eyeRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.closePath();
+      // ojo derecho
+      ctx.beginPath();
+      ctx.arc(headCenterX + eyeOffsetX, eyeY, eyeRadius, 0, Math.PI * 2);
       ctx.fill();
       ctx.closePath();
 
-      // Cuerpo
-      const bodyWidth = size * 0.2;
-      const bodyHeight = size * 0.35;
-      const bodyX = headCenterX - bodyWidth / 2;
-      const bodyY = headCenterY + headRadius * 0.2;
-      ctx.fillStyle = '#0077cc';
-      ctx.fillRect(bodyX, bodyY, bodyWidth, bodyHeight);
+      // --- Boca ---
+      const mouthWidth = size * 0.12;
+      const mouthY = headCenterY + size * 0.05;
+      ctx.strokeStyle = '#b03030';
+      ctx.lineWidth = Math.max(1, size * 0.008);
+      ctx.beginPath();
+      ctx.arc(headCenterX, mouthY, mouthWidth/2, 0, Math.PI, false);
+      ctx.stroke();
+      ctx.closePath();
 
-      // Brazos
-      ctx.strokeStyle = '#0077cc';
+      // --- Nariz (línea sencilla) ---
+      ctx.strokeStyle = '#e09f9f';
+      ctx.lineWidth = Math.max(1, size * 0.006);
+      ctx.beginPath();
+      ctx.moveTo(headCenterX, headCenterY);
+      ctx.lineTo(headCenterX, headCenterY + size * 0.04);
+      ctx.stroke();
+      ctx.closePath();
+
+      // --- Cuerpo ---
+      const bodyWidth = size * 0.3;
+      const bodyHeight = size * 0.5;
+      const bodyX = headCenterX - bodyWidth / 2;
+      const bodyY = headCenterY + headRadius * 0.3;
+      ctx.fillStyle = '#0077cc'; // ropa
+      ctx.beginPath();
+      ctx.rect(bodyX, bodyY, bodyWidth, bodyHeight);
+      ctx.fill();
+      ctx.closePath();
+
+      // Detalle de ropa (líneas)
+      ctx.strokeStyle = '#005fa3';
+      ctx.lineWidth = Math.max(1, size * 0.008);
+      ctx.beginPath();
+      ctx.moveTo(bodyX + bodyWidth*0.2, bodyY + bodyHeight*0.2);
+      ctx.lineTo(bodyX + bodyWidth*0.8, bodyY + bodyHeight*0.2);
+      ctx.moveTo(bodyX + bodyWidth*0.2, bodyY + bodyHeight*0.5);
+      ctx.lineTo(bodyX + bodyWidth*0.8, bodyY + bodyHeight*0.5);
+      ctx.stroke();
+      ctx.closePath();
+
+      // --- Brazos ---
+      ctx.strokeStyle = '#fdd7b0'; // tono piel
       ctx.lineWidth = Math.max(2, size * 0.03);
+      // brazo izquierdo
       ctx.beginPath();
       ctx.moveTo(bodyX, bodyY + size * 0.05);
-      ctx.lineTo(bodyX - size * 0.15, bodyY + size * 0.15);
+      ctx.lineTo(bodyX - size * 0.3, bodyY + size * 0.25);
       ctx.stroke();
       ctx.closePath();
+      // brazo derecho
       ctx.beginPath();
       ctx.moveTo(bodyX + bodyWidth, bodyY + size * 0.05);
-      ctx.lineTo(bodyX + bodyWidth + size * 0.15, bodyY + size * 0.15);
+      ctx.lineTo(bodyX + bodyWidth + size * 0.3, bodyY + size * 0.25);
       ctx.stroke();
       ctx.closePath();
 
-      // Piernas
-      ctx.strokeStyle = '#000';
+      // --- Piernas ---
+      ctx.strokeStyle = '#000'; // zapato o contorno
       ctx.lineWidth = Math.max(2, size * 0.03);
+      // pierna izquierda
       ctx.beginPath();
-      ctx.moveTo(headCenterX - size * 0.05, bodyY + bodyHeight);
-      ctx.lineTo(headCenterX - size * 0.05, bodyY + bodyHeight + size * 0.2);
+      ctx.moveTo(headCenterX - size * 0.1, bodyY + bodyHeight);
+      ctx.lineTo(headCenterX - size * 0.1, bodyY + bodyHeight + size * 0.4);
       ctx.stroke();
       ctx.closePath();
+      // pierna derecha
       ctx.beginPath();
-      ctx.moveTo(headCenterX + size * 0.05, bodyY + bodyHeight);
-      ctx.lineTo(headCenterX + size * 0.05, bodyY + bodyHeight + size * 0.2);
+      ctx.moveTo(headCenterX + size * 0.1, bodyY + bodyHeight);
+      ctx.lineTo(headCenterX + size * 0.1, bodyY + bodyHeight + size * 0.4);
       ctx.stroke();
+      ctx.closePath();
+
+      // Opcional: zapatos (círculos pequeños al final)
+      ctx.fillStyle = '#333';
+      ctx.beginPath();
+      ctx.arc(headCenterX - size * 0.1, bodyY + bodyHeight + size * 0.4, size * 0.05, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.closePath();
+      ctx.beginPath();
+      ctx.arc(headCenterX + size * 0.1, bodyY + bodyHeight + size * 0.4, size * 0.05, 0, Math.PI * 2);
+      ctx.fill();
       ctx.closePath();
     }
 
@@ -267,7 +364,8 @@
       canvas.height = ch;
       // Recalcular parámetros dependientes de tamaño
       groundHeight = ch * 0.2;
-      playerSize = groundHeight * 0.5;
+      playerSize = groundHeight * 1.0;
+      playerY = ch - groundHeight - playerSize;
       gravity = 0.0150 * ch;
       jumpVelocity = -3.2 * ch;
       speed = 0.9 * cw;
